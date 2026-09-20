@@ -62,6 +62,7 @@ Example:
 ./mvnw clean test
 ./mvnw -Dtest=ReminderBenchmarkTest test
 
+Observed Result
 ========== REMINDER BENCHMARK ==========
 Reminders          : 20
 Timezones          : Asia/Kolkata, America/New_York
@@ -82,10 +83,6 @@ Provide the exact command or steps used to run the problem-specific verification
 ```text
 
 ```
-
-Report the observed result, including relevant counts, terminal states, or mismatches. Do not report an expected result as though it was observed.
-
-Describe the failure or recovery scenario demonstrated in your video and how a reviewer can reproduce it.
 
 ## Architecture and data flow
 
@@ -138,34 +135,216 @@ The system uses a simple layered architecture:
                           ▼
                      PostgreSQL
 
+For reminder creation:
+HTTP Request
+     ↓
+ReminderController
+     ↓
+ReminderService
+     ↓
+TimeService
+     ↓
+ReminderRepository
+     ↓
+PostgreSQL
+
+Scheduled execution flow:
+Application Scheduler
+        ↓
+Find due SCHEDULED reminders
+        ↓
+Database-backed claim
+        ↓
+SCHEDULED → RUNNING
+        ↓
+Create execution attempt
+        ↓
+Notification Destination
+        ↓
+Success / Temporary Failure / Permanent Failure
+        ↓
+Persist result
+
+Recovery flow
+Application restart
+        ↓
+Find RUNNING reminders
+        ↓
+Recover interrupted work
+        ↓
+RUNNING → SCHEDULED
+        ↓
+Normal scheduler processing
+```
 ## Technology choices
 
-Why did you choose this stack? What alternatives did you consider? What trade-offs did you accept?
+### Java 21
+
+Java 21 was selected because it provides a strongly typed, mature runtime and works well with the selected Spring Boot stack.
+
+### Spring Boot
+
+Spring Boot was selected for:
+
+- REST API development
+- dependency injection
+- transaction management
+- scheduled execution
+- Spring Data JPA
+- automated testing
+
+It also keeps the implementation relatively small and easy to reason about.
+
+### PostgreSQL
+
+PostgreSQL is used as the durable source of truth for:
+
+- reminder state
+- scheduled execution time
+- execution attempts
+- notification deliveries
+
+PostgreSQL also provides transactions and database-level unique constraints, which are useful for implementing durable idempotency.
+
+### Maven
+
+Maven Wrapper is included so that the project can be built and tested without requiring a separately installed Maven version.
+
+### Alternatives considered
+
+I considered using technologies such as:
+
+- Redis
+- Kafka
+- Quartz
+- a distributed workflow engine
+
+These were intentionally not introduced.
+
+The assessment focuses on durable scheduling, recovery, retries, timezone correctness, and idempotency. Introducing additional infrastructure would increase setup and operational complexity without being necessary to demonstrate these requirements.
+
+The PostgreSQL-backed design keeps the important correctness properties visible and testable.
 
 ## Important decisions
 
-Describe two or three decisions that materially shaped the solution.
+### 1. PostgreSQL is the source of truth
+
+Reminder state is persisted in PostgreSQL rather than being maintained only in memory.
+
+This means reminder state survives application restarts.
+
+The scheduler discovers due work from the database instead of relying on an in-memory timer as the authoritative schedule.
+
+### 2. Explicit reminder state machine
+
+The implementation uses explicit states:
+
+```text
+SCHEDULED
+RUNNING
+DELIVERED
+CANCELLED
+FAILED
+```
 
 ## Assumptions and limitations
 
-List relevant assumptions, known limitations, and deliberately unfinished work.
+### Assumptions
+
+- PostgreSQL is available to the application.
+- Reminder creation and editing require a future scheduled time.
+- Timezones supplied by the API are valid IANA timezone identifiers.
+- PostgreSQL is the authoritative persistent store.
+- The fake notification destination represents the external notification provider.
+- Temporary delivery failures are retryable.
+- Permanent delivery failures are terminal.
+- Interrupted `RUNNING` reminders can be recovered after application restart.
+
+### Limitations
+
+The following features are intentionally outside the scope of this implementation:
+
+- Recurring reminders
+- Natural-language reminder parsing
+- Real email/SMS/push notification providers
+- Authentication
+- Authorization
+- Multi-tenancy
+- Distributed workflow orchestration
+- Polished frontend dashboard
+- Advanced production observability
+- High-availability deployment
+- Dedicated JMH performance benchmarking
+
+The scheduler is intentionally simple and runs inside the Spring Boot application.
+
+The current implementation is primarily designed around a single application process. The database-backed claim protects against concurrent execution claiming the same scheduled reminder, but a large multi-instance production deployment would require additional worker coordination and operational considerations.
 
 ## Production and scale
 
-If this prototype needed to operate in production or at significantly greater scale, what would you change first and why? Clearly distinguish what the submitted implementation does now from improvements you are proposing.
+### Current implementation
+
+The current implementation consists of:
+
+```text
+Spring Boot
+    +
+PostgreSQL
+    +
+Database-backed scheduler
+    +
+Fake notification destination
+```
 
 ## AI usage
 
-List any AI tools used, explain how they contributed, and describe how you reviewed or tested their output. If you did not use AI tools, say so.
+AI tools were used during development.
+
+ChatGPT was used for:
+
+- discussing the system architecture
+- designing the reminder state machine
+- designing the persistence model
+- scaffolding parts of the Spring Boot implementation
+- debugging compilation and runtime issues
+- designing test scenarios
+- reasoning about timezone handling
+- reasoning about retry and idempotency behavior
+- reasoning about restart recovery
+- reviewing implementation decisions
+- preparing the submission documentation
+
+The implementation was reviewed, modified, executed, and tested locally.
+
+Verification was performed using:
+
+- automated tests
+- REST API testing
+- PostgreSQL inspection
+- application restart/recovery testing
+- scheduler execution
+- failure/retry testing
+- duplicate-delivery testing
+- benchmark execution
+
+AI assistance was used as a development aid, while the final implementation and its observed behavior were locally verified.
 
 ## Credibility note
 
-Describe one product or system you previously helped ship:
+### DSTTE Bihar Internship Portal
 
-- The problem it solved
-- Your personal contribution
-- The scale or operational complexity involved
-- One difficult engineering or product decision
-- A public link or other evidence, when available
+Public system:
 
-Confidential details may be anonymized and figures may be approximate.
+https://internship.bihar.gov.in/
+
+I contributed to the DSTTE Bihar Internship Portal by developing a certificate generation system for students who successfully completed their internships.
+
+The certificate-generation functionality allows certificates to be generated for students after completion of their internship and forms part of the portal's internship workflow.
+
+The portal is used by students and recruiters as part of the Bihar internship program.
+
+My contribution focused on the certificate-generation system and its supporting frontend and backend implementation.
+
+Public evidence:
+
+https://internship.bihar.gov.in/
