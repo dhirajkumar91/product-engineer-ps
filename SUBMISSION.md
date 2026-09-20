@@ -20,6 +20,41 @@ Create a PostgreSQL database named:
 ```sql
 CREATE DATABASE durable_reminders;
 
+```
+Configure the PostgreSQL connection in:
+
+durable-reminders/backend/src/main/resources/application.properties
+
+Start the application
+
+From the backend directory:
+
+cd durable-reminders/backend
+./mvnw spring-boot:run
+
+On Windows PowerShell:
+
+cd durable-reminders/backend
+.\mvnw.cmd spring-boot:run
+
+The application starts on:
+
+http://localhost:8080
+
+Successful scenario
+
+Create a reminder using:
+
+POST /api/reminders
+Content-Type: application/json
+
+Example:
+
+{
+  "content": "Prepare Caygnus interview",
+  "scheduledAt": "2026-09-21T00:30",
+  "timezone": "Asia/Kolkata"
+}
 
 ## Run the tests
 
