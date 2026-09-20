@@ -2,11 +2,10 @@
 
 ## Candidate
 
-- **Name:**
-- **Email:**
-- **GitHub:**
-- **Selected problem:**
-- **Demo video:**
+- **Name:** Dhiraj Kumar
+- **Email:** dhirajkr0901@gmail.com
+- **GitHub:** https://github.com/dhirajkumar91
+- **Selected problem:** Problem 3 — Durable Reminders and Follow-Ups
 
 ## Run the project
 
