@@ -9,13 +9,17 @@
 
 ## Run the project
 
-List prerequisites and provide exact commands. Include required environment-variable names, but never commit secret values.
+### Prerequisites
 
-```text
-Add setup and run commands here.
-```
+- Java 21
+- PostgreSQL
+- Maven Wrapper
 
-Explain how the reviewer can trigger the successful scenario and the required failure or recovery scenario.
+Create a PostgreSQL database named:
+
+```sql
+CREATE DATABASE durable_reminders;
+
 
 ## Run the tests
 
