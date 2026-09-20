@@ -59,16 +59,6 @@ Example:
 ## Run the tests
 
 ```text
-Add test commands here.
-```
-
-## Acceptance scenarios and verification
-
-List the acceptance scenarios you completed. For anything incomplete or intentionally interpreted differently, explain the current behaviour and your reasoning.
-
-Provide the exact command or steps used to run the problem-specific verification benchmark:
-
-```text
 ./mvnw clean test
 ./mvnw -Dtest=ReminderBenchmarkTest test
 
@@ -81,7 +71,16 @@ Logical deliveries : 20
 Execution time     : 743 ms
 ==========================================
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS
+BUILD SUCCESS```
+
+## Acceptance scenarios and verification
+
+List the acceptance scenarios you completed. For anything incomplete or intentionally interpreted differently, explain the current behaviour and your reasoning.
+
+Provide the exact command or steps used to run the problem-specific verification benchmark:
+
+```text
+
 ```
 
 Report the observed result, including relevant counts, terminal states, or mismatches. Do not report an expected result as though it was observed.
