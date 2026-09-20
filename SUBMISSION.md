@@ -69,7 +69,19 @@ List the acceptance scenarios you completed. For anything incomplete or intentio
 Provide the exact command or steps used to run the problem-specific verification benchmark:
 
 ```text
-Add benchmark commands or steps here.
+./mvnw clean test
+./mvnw -Dtest=ReminderBenchmarkTest test
+
+========== REMINDER BENCHMARK ==========
+Reminders          : 20
+Timezones          : Asia/Kolkata, America/New_York
+Delivered          : 20
+Attempt records    : 20
+Logical deliveries : 20
+Execution time     : 743 ms
+==========================================
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
 ```
 
 Report the observed result, including relevant counts, terminal states, or mismatches. Do not report an expected result as though it was observed.
