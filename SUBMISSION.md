@@ -89,7 +89,54 @@ Describe the failure or recovery scenario demonstrated in your video and how a r
 
 ## Architecture and data flow
 
-Explain the main components, their responsibilities, and how data moves between them. A small diagram is welcome but not required.
+## Architecture and data flow
+
+The system uses a simple layered architecture:
+
+```text
+                    ┌─────────────────────┐
+                    │   REST Controller   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Reminder Service  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   JPA Repositories  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │     PostgreSQL      │
+                    └─────────────────────┘
+
+
+              Scheduled polling
+                     │
+                     ▼
+            ┌───────────────────┐
+            │ Reminder Scheduler│
+            └─────────┬─────────┘
+                      │
+                      ▼
+        ┌────────────────────────────┐
+        │ Reminder Execution Service │
+        └──────────────┬─────────────┘
+                       │
+                ┌──────┴──────┐
+                │             │
+                ▼             ▼
+        ┌──────────────┐  ┌────────────────────┐
+        │   Attempts   │  │ Notification       │
+        │              │  │ Destination        │
+        └──────┬───────┘  └─────────┬──────────┘
+               │                    │
+               └──────────┬─────────┘
+                          ▼
+                     PostgreSQL
 
 ## Technology choices
 
